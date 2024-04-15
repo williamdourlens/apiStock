@@ -24,6 +24,7 @@ class FournisseurController extends AbstractController
         );
     }
 
+    /*
     #[Route('/fournisseur/post', name: 'app_fournisseur_post', methods: ['POST'])]
     public function create(Request $request, SerializerInterface $serializer, ManagerRegistry $doctrine): JsonResponse
     {
@@ -48,4 +49,5 @@ class FournisseurController extends AbstractController
             $jsonFournisseur, Response::HTTP_CREATED, [], true
         );
     }
+    */
 }

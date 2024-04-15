@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Categorie;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\CategorieRepository;
+use App\Repository\PlatRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -43,6 +44,58 @@ class CategorieController extends AbstractController
 
         return new JsonResponse(
             $jsonCategorie, Response::HTTP_CREATED, [], true
+        );
+    }
+
+    #[Route('/categorie/delete/{id}', name: 'app_categorie_delete', methods: ['DELETE'])]
+    public function delete(int $id, CategorieRepository $categorieRepository, PlatRepository $platRepository, ManagerRegistry $doctrine): JsonResponse
+    {
+        $categorie = $categorieRepository->find($id);
+
+        if ($categorie === null) {
+            return new JsonResponse(
+                'Categorie not found', Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $entityManager = $doctrine->getManager();
+
+        // Remove all the associated plats
+        $plats = $platRepository->findBy(['id_categorie' => $id]);
+        foreach ($plats as $plat) {
+            $entityManager->remove($plat);
+        }
+
+        $entityManager->remove($categorie);
+        $entityManager->flush();
+
+        return new JsonResponse(
+            'Categorie deleted', Response::HTTP_OK
+        );
+    }
+
+    #[Route('/categorie/patch/{id}', name: 'app_categorie_patch', methods: ['PATCH'])]
+    public function update(int $id, Request $request, CategorieRepository $categorieRepository, SerializerInterface $serializer, ManagerRegistry $doctrine): JsonResponse
+    {
+        $categorie = $categorieRepository->find($id);
+
+        if ($categorie === null) {
+            return new JsonResponse(
+                'Categorie not found', Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $categorie->setNom($data['nom']);
+
+        $entityManager = $doctrine->getManager();
+        $entityManager->persist($categorie);
+        $entityManager->flush();
+
+        $jsonCategorie = $serializer->serialize($categorie, 'json');
+
+        return new JsonResponse(
+            $jsonCategorie, Response::HTTP_OK, [], true
         );
     }
 }

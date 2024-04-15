@@ -46,4 +46,53 @@ class CompositionPlatsController extends AbstractController
             $jsonCompositionPlat, Response::HTTP_CREATED, [], true
         );
     }
+
+    #[Route('/composition_plats/delete/{id}', name: 'app_compositionPlats_delete', methods: ['DELETE'])]
+    public function delete(int $id, CompositionPlatsRepository $compositionPlatsRepository, ManagerRegistry $doctrine): JsonResponse
+    {
+        $compositionPlat = $compositionPlatsRepository->find($id);
+
+        if ($compositionPlat === null) {
+            return new JsonResponse(
+                'CompositionPlat not found', Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $entityManager = $doctrine->getManager();
+        $entityManager->remove($compositionPlat);
+        $entityManager->flush();
+
+        return new JsonResponse(
+            'Composition deleted', Response::HTTP_OK
+        );
+    }
+
+    #[Route('/composition_plats/patch/{id}', name: 'app_compositionPlats_patch', methods: ['PATCH'])]
+    public function update(int $id, Request $request, CompositionPlatsRepository $compositionPlatsRepository, SerializerInterface $serializer, ManagerRegistry $doctrine): JsonResponse
+    {
+        $compositionPlat = $compositionPlatsRepository->find($id);
+
+        if ($compositionPlat === null) {
+            return new JsonResponse(
+                'CompositionPlat not found', Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $data = json_decode($request->getContent(), true);
+        // Set the properties of the compositionPlat object based on the received data
+        $compositionPlat->setIdPlat($data['id_plat']);
+        $compositionPlat->setIdIngredient($data['id_ingredient']);
+
+        // Save the compositionPlat object to the database
+        $entityManager = $doctrine->getManager();
+        $entityManager->persist($compositionPlat);
+        $entityManager->flush();
+
+        // Serialize the updated compositionPlat object to JSON
+        $jsonCompositionPlat = $serializer->serialize($compositionPlat, 'json');
+
+        return new JsonResponse(
+            $jsonCompositionPlat, Response::HTTP_OK, [], true
+        );
+    }
 }
