@@ -10,6 +10,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Doctrine\Persistence\ManagerRegistry;
 
 class CompositionPlatsController extends AbstractController
 {
@@ -24,7 +25,7 @@ class CompositionPlatsController extends AbstractController
     }
     
     #[Route('/composition_plats/post', name: 'app_compositionPlats_post', methods: ['POST'])]
-    public function create(Request $request, SerializerInterface $serializer): JsonResponse
+    public function create(Request $request, SerializerInterface $serializer, ManagerRegistry $doctrine): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         // Create a new compositionPlat object
@@ -34,7 +35,7 @@ class CompositionPlatsController extends AbstractController
         $compositionPlat->setIdIngredient($data['id_ingredient']);
 
         // Save the compositionPlat object to the database
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $doctrine->getManager();
         $entityManager->persist($compositionPlat);
         $entityManager->flush();
 
