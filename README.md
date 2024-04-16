@@ -4,7 +4,7 @@ API permettant la liaison entre l'application de stock et sa base de données.
 
 ## Composants
 
-Créé avec Symfony, cette api utilise de multiples Doctrine en tant qu'ORM
+Créé avec Symfony, cette api utilise Doctrine en tant qu'ORM
 
 ## Installation
 
