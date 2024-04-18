@@ -25,6 +25,24 @@ class PlatController extends AbstractController
         );
     }
 
+    #[Route('/plat/get/{id}', name: 'app_plat_get_id')]
+    public function show(int $id, PlatRepository $platRepository, SerializerInterface $serializer): JsonResponse
+    {
+        $plat = $platRepository->find($id);
+
+        if ($plat === null) {
+            return new JsonResponse(
+                'Plat not found', Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $jsonPlat = $serializer->serialize($plat, 'json');
+
+        return new JsonResponse(
+            $jsonPlat, Response::HTTP_OK, [], true
+        );
+    }
+
     #[Route('/plat/post', name: 'app_plat_post', methods: ['POST'])]
     public function create(Request $request, SerializerInterface $serializer, ManagerRegistry $doctrine): JsonResponse
     {

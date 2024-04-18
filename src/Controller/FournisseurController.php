@@ -24,6 +24,24 @@ class FournisseurController extends AbstractController
         );
     }
 
+    #[Route('/fournisseur/get/{id}', name: 'app_fournisseur_get_id')]
+    public function show(int $id, FournisseurRepository $fournisseurRepository, SerializerInterface $serializer): JsonResponse
+    {
+        $fournisseur = $fournisseurRepository->find($id);
+
+        if ($fournisseur === null) {
+            return new JsonResponse(
+                'Fournisseur not found', Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $jsonFournisseur = $serializer->serialize($fournisseur, 'json');
+
+        return new JsonResponse(
+            $jsonFournisseur, Response::HTTP_OK, [], true
+        );
+    }
+
     /*
     #[Route('/fournisseur/post', name: 'app_fournisseur_post', methods: ['POST'])]
     public function create(Request $request, SerializerInterface $serializer, ManagerRegistry $doctrine): JsonResponse

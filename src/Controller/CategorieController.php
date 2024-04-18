@@ -25,6 +25,24 @@ class CategorieController extends AbstractController
         );
     }
 
+    #[Route('/categorie/get/{id}', name: 'app_categorie_get_id')]
+    public function show(int $id, CategorieRepository $categorieRepository, SerializerInterface $serializer): JsonResponse
+    {
+        $categorie = $categorieRepository->find($id);
+
+        if ($categorie === null) {
+            return new JsonResponse(
+                'Categorie not found', Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $jsonCategorie = $serializer->serialize($categorie, 'json');
+
+        return new JsonResponse(
+            $jsonCategorie, Response::HTTP_OK, [], true
+        );
+    }
+
     #[Route('/categorie/post', name: 'app_categorie_post', methods: ['POST'])]
     public function create(Request $request, SerializerInterface $serializer, ManagerRegistry $doctrine): JsonResponse
     {

@@ -23,6 +23,24 @@ class CompositionPlatsController extends AbstractController
             $jsonCompositionPlatsList, Response::HTTP_OK, [], true
         );
     }
+
+    #[Route('/composition_plats/get/{id}', name: 'app_compositionPlats_get_id')]
+    public function show(int $id, CompositionPlatsRepository $compositionPlatsRepository, SerializerInterface $serializer): JsonResponse
+    {
+        $compositionPlat = $compositionPlatsRepository->find($id);
+
+        if ($compositionPlat === null) {
+            return new JsonResponse(
+                'CompositionPlat not found', Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $jsonCompositionPlat = $serializer->serialize($compositionPlat, 'json');
+
+        return new JsonResponse(
+            $jsonCompositionPlat, Response::HTTP_OK, [], true
+        );
+    }
     
     #[Route('/composition_plats/post', name: 'app_compositionPlats_post', methods: ['POST'])]
     public function create(Request $request, SerializerInterface $serializer, ManagerRegistry $doctrine): JsonResponse

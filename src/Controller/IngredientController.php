@@ -26,6 +26,24 @@ class IngredientController extends AbstractController
         );
     }
 
+    #[Route('/ingredient/get/{id}', name: 'app_ingredient_get_id')]
+    public function show(int $id, IngredientRepository $ingredientRepository, SerializerInterface $serializer): JsonResponse
+    {
+        $ingredient = $ingredientRepository->find($id);
+
+        if ($ingredient === null) {
+            return new JsonResponse(
+                'Ingredient not found', Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $jsonIngredient = $serializer->serialize($ingredient, 'json');
+
+        return new JsonResponse(
+            $jsonIngredient, Response::HTTP_OK, [], true
+        );
+    }
+
     #[Route('/ingredient/post', name: 'app_ingredient_post', methods: ['POST'])]
     public function create(Request $request, SerializerInterface $serializer, ManagerRegistry $doctrine): JsonResponse
     {
