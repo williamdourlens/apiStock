@@ -77,6 +77,28 @@ class CompositionPlatsController extends AbstractController
         );
     }
 
+    #[Route('/composition_plats/delete_by_plat/{id_plat}', name: 'app_compositionPlats_delete_by_plat', methods: ['DELETE'])]
+    public function deleteByPlat(int $id_plat, CompositionPlatsRepository $compositionPlatsRepository, ManagerRegistry $doctrine): JsonResponse
+    {
+        $compositionPlatsList = $compositionPlatsRepository->findBy(['id_plat' => $id_plat]);
+
+        if (empty($compositionPlatsList)) {
+            return new JsonResponse(
+                'No compositionPlats found for the given id_plat', Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $entityManager = $doctrine->getManager();
+        foreach ($compositionPlatsList as $compositionPlat) {
+            $entityManager->remove($compositionPlat);
+        }
+        $entityManager->flush();
+
+        return new JsonResponse(
+            'CompositionPlats deleted', Response::HTTP_OK
+        );
+    }
+
     #[Route('/composition_plats/patch/{id}', name: 'app_compositionPlats_patch', methods: ['PATCH'])]
     public function update(int $id, Request $request, CompositionPlatsRepository $compositionPlatsRepository, SerializerInterface $serializer, ManagerRegistry $doctrine): JsonResponse
     {
